@@ -85,6 +85,7 @@ class Graph:
     def __init__(self, chart, start):
         pass
 
+#!TESTY BOI
 if __name__ == '__main__':
     chart1 = [[1,0,0,1], [1,0, 0, 1], [1,0,1,1], [0, 0 , 1, 1]]
     start1 = [(3,0)]
