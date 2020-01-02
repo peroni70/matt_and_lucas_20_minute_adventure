@@ -1,5 +1,6 @@
 
 from heapq import *
+from PIL import Image
 
 class MazeRunner:
 
@@ -70,6 +71,42 @@ class MazeRunner:
             current_node = next_node
 
         return path
+    
+    def draw_path(self, path):
+        chart = self.maze.chart
+        height = len(chart)
+        width = len(chart[0])
+        dimensions = (height, width)
+        
+        picture = Image.new("RGB", dimensions, 0)
+
+        for r in range(height):
+            for c in range(width):
+                if chart[r][c] == 1:
+                    rgb_black = (0,0,0)
+                    picture.putpixel((c,r), rgb_black)
+                else:
+                    if (r,c) in self.maze.target:
+                        rgb_green = (0, 102, 0)
+                        picture.putpixel((c,r), rgb_green)
+                    elif (r,c) in self.maze.start:
+                        rgb_red = (153, 0, 0)
+                        picture.putpixel((c,r), rgb_red)
+                    else:
+                        rgb_white = (255, 255, 255)
+                        picture.putpixel((c,r), rgb_white)
+        
+        for _, i in enumerate(path):
+            x = i[1]
+            y = i[0]
+            if (y,x) not in self.maze.target and (y,x) not in self.maze.start:
+                rgb_teal = (51, 255, 255)
+                picture.putpixel((x,y), rgb_teal)
+
+        #TODO: Also incorporate this new size into parameters later too lazy now
+        new_size = (500, 500)
+        picture = picture.resize(new_size, Image.NEAREST)
+        picture.save("Maze_Soln", "png")
 
 
 
