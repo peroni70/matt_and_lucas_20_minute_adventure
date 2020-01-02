@@ -1,7 +1,8 @@
 
 from heapq import *
-from PIL import Image
 
+from PIL import Image
+import math
 class MazeRunner:
 
     def __init__(self, maze=None):
@@ -66,7 +67,10 @@ class MazeRunner:
                     if value_map[neighbor] < dist_next_node:
                         dist_next_node = value_map[neighbor]
                         next_node = neighbor
-            
+
+            if math.isinf(dist_next_node):
+                raise NameError("No valid path!")
+                
             path.append(next_node)
             current_node = next_node
 
