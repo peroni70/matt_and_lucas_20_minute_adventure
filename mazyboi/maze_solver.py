@@ -1,8 +1,12 @@
 
 from heapq import *
-
-from PIL import Image
+import tkinter as tk
+from PIL import Image, ImageTk
 import math
+
+global xs, ys, xt, yt
+count = 0
+
 class MazeRunner:
 
     def __init__(self, maze=None):
@@ -48,12 +52,12 @@ class MazeRunner:
         #dimensions of maze
         n = len(self.maze.chart)
         m = len(self.maze.chart[0])
-
         min_dist = float('inf')
         for _, i in enumerate(self.maze.start):
             if value_map[i] < min_dist:
                 start_node = i
-        
+                min_dist = value_map[i]
+
         current_node = start_node
         path = [start_node]
         
@@ -112,6 +116,16 @@ class MazeRunner:
         picture = picture.resize(new_size, Image.NEAREST)
         picture.save("Maze_Soln", "png")
 
+    def create_maze_from_image(self, image):
+        width, height = image.size
+        chart = [[1 for i in range(width)] for j in range(height)]
+        for i in range(height):
+            for j in range(width):
+                #! FIX ME 
+                if sum(image.getpixel((j,i))) != 0:
+                    chart[i][j] = 0
+        return chart
+            
 
 
 class Maze:
@@ -126,13 +140,54 @@ class Graph:
     def __init__(self, chart, start):
         pass
 
+
 #!TESTY BOI
 if __name__ == '__main__':
-    chart1 = [[1,0,0,1], [1,0, 0, 1], [1,0,1,1], [0, 0 , 1, 1]]
-    start1 = [(3,0)]
-    target1 = [(0,1), (0,2)]
+    
+    def callback(event):
+        global count, xs, ys, xt, yt
+        if count == 0:
+            xs = event.x
+            ys = event.y
+        elif count == 1:
+            xt = event.x
+            yt = event.y
+        count +=1
+        print("clicked at", event.x, event.y)
+    # chart1 = [[1,0,0,1], [1,0, 0, 1], [1,0,1,1], [0, 0 , 1, 1]]
+    # start1 = [(3,0)]
+    # target1 = [(0,1), (0,2)]
+    root = tk.Tk()
+    root.geometry('500x500')
+    # load image
+    image = Image.open("mazyboi/maze2.png")
+    out = image.resize((500,500))
+    photo = ImageTk.PhotoImage(out)
+
+    # label with image
+    l = tk.Label(root, image=photo)
+    l.pack()
+
+    # bind click event to image
+    l.bind('<Button-1>', callback)
+
+    # button with image binded to the same function 
+    b = tk.Button(root, image=photo, command=callback)
+    b.pack()
+
+    # button with text closing window
+    b = tk.Button(root, text="Close", command=root.destroy)
+    b.pack()
+
+    # "start the engine"
+    root.mainloop()
+    solver1 = MazeRunner()
+    chart1 = solver1.create_maze_from_image(out)
+    start1 = [(ys,xs)]
+    target1 = [(yt,xt)]
     maze1 = Maze(chart1, start1, target1)
-    solver1 = MazeRunner(maze1)
+    solver1.set_maze(maze1)
     value_map1 = solver1.label_path()
     path = solver1.find_path(value_map1)
     print(path)
+    solver1.draw_path(path)
