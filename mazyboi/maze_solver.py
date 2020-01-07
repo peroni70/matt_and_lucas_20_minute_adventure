@@ -80,7 +80,7 @@ class MazeRunner:
 
         return path
     
-    def draw_path(self, path):
+    def draw_path(self, path=None):
         chart = self.maze.chart
         height = len(chart)
         width = len(chart[0])
@@ -103,26 +103,28 @@ class MazeRunner:
                     else:
                         rgb_white = (255, 255, 255)
                         picture.putpixel((c,r), rgb_white)
-        
-        for _, i in enumerate(path):
-            x = i[1]
-            y = i[0]
-            if (y,x) not in self.maze.target and (y,x) not in self.maze.start:
-                rgb_teal = (51, 255, 255)
-                picture.putpixel((x,y), rgb_teal)
+        if path:
+            for _, i in enumerate(path):
+                x = i[1]
+                y = i[0]
+                if (y,x) not in self.maze.target and (y,x) not in self.maze.start:
+                    rgb_teal = (51, 255, 255)
+                    picture.putpixel((x,y), rgb_teal)
 
         #TODO: Also incorporate this new size into parameters later too lazy now
         new_size = (500, 500)
         picture = picture.resize(new_size, Image.NEAREST)
         picture.save("Maze_Soln", "png")
 
+    # Creates a 2d-array-like chart of a given maze image
+    # using a thresholding method.
     def create_maze_from_image(self, image):
         width, height = image.size
         chart = [[1 for i in range(width)] for j in range(height)]
         for i in range(height):
             for j in range(width):
-                #! FIX ME 
-                if sum(image.getpixel((j,i))) != 0:
+                pix = image.getpixel((j,i))
+                if sum(pix)/len(pix) > 100 :
                     chart[i][j] = 0
         return chart
             
@@ -160,7 +162,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.geometry('500x500')
     # load image
-    image = Image.open("mazyboi/maze2.png")
+    image = Image.open("mazyboi/noob_noob_maze.jpg")
     out = image.resize((500,500))
     photo = ImageTk.PhotoImage(out)
 
@@ -187,6 +189,7 @@ if __name__ == '__main__':
     target1 = [(yt,xt)]
     maze1 = Maze(chart1, start1, target1)
     solver1.set_maze(maze1)
+    #solver1.draw_path()
     value_map1 = solver1.label_path()
     path = solver1.find_path(value_map1)
     print(path)
