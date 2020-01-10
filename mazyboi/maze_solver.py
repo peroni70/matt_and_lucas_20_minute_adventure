@@ -3,7 +3,6 @@ from heapq import *
 import tkinter as tk
 from PIL import Image, ImageTk
 import math
-
 global xs, ys, xt, yt
 count = 0
 
@@ -57,6 +56,9 @@ class MazeRunner:
             if value_map[i] < min_dist:
                 start_node = i
                 min_dist = value_map[i]
+
+        if min_dist==float('inf'):
+            raise NameError('No valid path!')
 
         current_node = start_node
         path = [start_node]
@@ -112,8 +114,8 @@ class MazeRunner:
                     picture.putpixel((x,y), rgb_teal)
 
         #TODO: Also incorporate this new size into parameters later too lazy now
-        new_size = (500, 500)
-        picture = picture.resize(new_size, Image.NEAREST)
+        #new_size = (500, 500)
+        #picture = picture.resize(new_size, Image.NEAREST)
         picture.save("Maze_Soln", "png")
 
     # Creates a 2d-array-like chart of a given maze image
@@ -124,29 +126,11 @@ class MazeRunner:
         for i in range(height):
             for j in range(width):
                 pix = image.getpixel((j,i))
-                if sum(pix)/len(pix) > 100 :
+                if sum(pix)/len(pix) > 250 :
                     chart[i][j] = 0
         return chart
-            
 
-
-class Maze:
-
-    def __init__(self, chart, start, target):
-        self.chart = chart #2D array-like
-        self.start = start #array-like indices of start node(s)
-        self.target = target #array-like indices of target node(s)
-
-class Graph:
-
-    def __init__(self, chart, start):
-        pass
-
-
-#!TESTY BOI
-if __name__ == '__main__':
-    
-    def callback(event):
+    def _callback(self, event):
         global count, xs, ys, xt, yt
         if count == 0:
             xs = event.x
@@ -155,41 +139,59 @@ if __name__ == '__main__':
             xt = event.x
             yt = event.y
         count +=1
-        print("clicked at", event.x, event.y)
-    # chart1 = [[1,0,0,1], [1,0, 0, 1], [1,0,1,1], [0, 0 , 1, 1]]
-    # start1 = [(3,0)]
-    # target1 = [(0,1), (0,2)]
-    root = tk.Tk()
-    root.geometry('500x500')
-    # load image
-    image = Image.open("mazyboi/noob_noob_maze.jpg")
-    out = image.resize((500,500))
-    photo = ImageTk.PhotoImage(out)
+        print("clicked at", event.x, event.y) 
 
-    # label with image
-    l = tk.Label(root, image=photo)
-    l.pack()
+    def create_gui(self, image_path):
+        root = tk.Tk()
+        # load image
+        image = Image.open(image_path)
+        image = image.convert("RGB")
 
-    # bind click event to image
-    l.bind('<Button-1>', callback)
+        root.geometry('750x750')
+        #TODO resizing?
+        out = image.resize((750,750))
+        photo = ImageTk.PhotoImage(out)
 
-    # button with image binded to the same function 
-    b = tk.Button(root, image=photo, command=callback)
-    b.pack()
+        # label with image
+        l = tk.Label(root, image=photo)
+        l.pack()
 
-    # button with text closing window
-    b = tk.Button(root, text="Close", command=root.destroy)
-    b.pack()
+        # bind click event to image
+        l.bind('<Button-1>', self._callback)
 
-    # "start the engine"
-    root.mainloop()
+        # button with image binded to the same function 
+        b = tk.Button(root, image=photo, command=self._callback)
+        b.pack()
+
+        # button with text closing window
+        b = tk.Button(root, text="Close", command=root.destroy)
+        b.pack()
+
+        # "start the engine"
+        root.mainloop()
+
+        # create the maze with start and target 
+        start = [(ys,xs)]
+        target = [(yt,xt)]
+        chart = self.create_maze_from_image(out)
+        maze = Maze(chart, start, target)
+
+        # set maze
+        self.maze = maze
+
+class Maze:
+
+    def __init__(self, chart, start, target):
+        self.chart = chart #2D array-like
+        self.start = start #array-like indices of start node(s)
+        self.target = target #array-like indices of target node(s)
+
+
+
+#!TESTY BOI
+if __name__ == '__main__':
     solver1 = MazeRunner()
-    chart1 = solver1.create_maze_from_image(out)
-    start1 = [(ys,xs)]
-    target1 = [(yt,xt)]
-    maze1 = Maze(chart1, start1, target1)
-    solver1.set_maze(maze1)
-    #solver1.draw_path()
+    solver1.create_gui("mazyboi/hexagon_maze.png")
     value_map1 = solver1.label_path()
     path = solver1.find_path(value_map1)
     print(path)
