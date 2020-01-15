@@ -126,7 +126,7 @@ class MazeRunner:
         for i in range(height):
             for j in range(width):
                 pix = image.getpixel((j,i))
-                if sum(pix)/len(pix) > 250 :
+                if sum(pix)/len(pix) > 240 :
                     chart[i][j] = 0
         return chart
 
@@ -191,7 +191,7 @@ class Maze:
 #!TESTY BOI
 if __name__ == '__main__':
     solver1 = MazeRunner()
-    solver1.create_gui("mazyboi/hexagon_maze.png")
+    solver1.create_gui("mazyboi/artistic_maze.png")
     value_map1 = solver1.label_path()
     path = solver1.find_path(value_map1)
     print(path)
