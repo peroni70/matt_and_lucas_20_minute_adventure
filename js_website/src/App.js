@@ -7,6 +7,7 @@ class App extends Component{
   state = {
     selectedFile: null
   }
+
   fileSelectHandler = event =>{
     this.setState({
       selectedFile: event.target.files[0]
@@ -14,8 +15,13 @@ class App extends Component{
   }
 
   fileUploadHandler = () => {
-    axios.post('');
+    const fd = new FormData();
+    fd.append('image', this.state.selectedFile, this.state.selectedFile.name);
+    axios.post('http://localhost:8080',fd).then(res => {
+      console.log(res);
+    });
   }
+
  render() {
   return (
     <div className="App">
